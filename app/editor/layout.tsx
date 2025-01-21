@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Game Editor',
-  description: 'Create your own text adventure games with our visual editor. Design locations, items, and custom commands in an intuitive interface.',
+  title: 'Text Based Adventure - Create, share, play',
+  description: 'Create and play interactive text adventures with our powerful game editor. Design immersive story-driven experiences.',
 };
 
 export default function EditorLayout({
