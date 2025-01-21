@@ -394,7 +394,7 @@ export class GameEngine {
       messages.push("That item doesn't exist.");
       return messages;
     }
-nd
+
     // Case 1: Using item on a focal point
     if (focalPointIndex !== null) {
       const focalPoint = this.getFocalPoints()[focalPointIndex];
