@@ -245,7 +245,8 @@ function Flow({ map, game, onChange, mapIndex, onNodeSelect, selectedNode }: Flo
         updatedMap.Locations[locationIndex].FoculPoints[fpIndex] = {
           ...updatedMap.Locations[locationIndex].FoculPoints[fpIndex],
           Name: newData.label,
-          Description: newData.description
+          Description: newData.description,
+          Flags: newData.flags || []
         };
         break;
       case 'event':
@@ -322,6 +323,7 @@ function Flow({ map, game, onChange, mapIndex, onNodeSelect, selectedNode }: Flo
           data: { 
             label: focalPoint.Name,
             description: focalPoint.Description,
+            flags: focalPoint.Flags || [],
             nodeType: 'focalPoint',
             locationIndex,
             fpIndex
