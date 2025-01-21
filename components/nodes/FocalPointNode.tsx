@@ -44,10 +44,21 @@ export const FocalPointNode = memo(({ data, isConnectable, selected }: any) => {
               {data.description}
             </div>
             {data.events?.length > 0 && (
-              <div className="mt-2 border-t border-gray-200 dark:border-gray-700 pt-2">
+              <div className="mt-2 border-t border-gray-200 dark:border-gray-700 pt-2 space-y-1">
                 <div className="text-xs text-gray-500 dark:text-gray-400">
                   Events: {data.events.map((event: any) => EVENT_TYPE_NAMES[event.Event]).join(', ')}
                 </div>
+              </div>
+            )}
+            {data.flags?.length > 0 && (
+              <div className="mt-2 border-t border-gray-200 dark:border-gray-700 pt-2 space-y-1">
+                <div className="text-xs font-medium text-gray-900 dark:text-gray-100">Flags:</div>
+                {data.flags.map((flag: any, index: number) => (
+                  <div key={index} className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                    <div className={`w-2 h-2 rounded-full ${flag.Flag ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                    <span>{flag.Name} = {flag.Flag.toString()}</span>
+                  </div>
+                ))}
               </div>
             )}
           </div>
