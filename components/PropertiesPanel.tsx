@@ -115,6 +115,67 @@ function FocalPointProperties({ data, onChange, game }: { data: any; onChange: (
           className="bg-gray-800 border-gray-700 text-gray-200"
         />
       </div>
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-medium text-gray-300">Flags</label>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              onChange({
+                flags: [...(data.flags || []), { Name: '', Flag: true }]
+              });
+            }}
+            className="text-gray-400 hover:text-gray-200"
+          >
+            <Plus className="w-4 h-4 mr-1" />
+            Add Flag
+          </Button>
+        </div>
+        <div className="space-y-2">
+          {data.flags?.map((flag: any, index: number) => (
+            <div key={index} className="flex items-center gap-2 bg-gray-800/50 p-2 rounded-lg">
+              <Input
+                value={flag.Name}
+                onChange={(e) => {
+                  const newFlags = [...(data.flags || [])];
+                  newFlags[index] = { ...flag, Name: e.target.value };
+                  onChange({ flags: newFlags });
+                }}
+                placeholder="Flag name"
+                className="flex-1 bg-gray-800 border-gray-700 text-gray-200"
+              />
+              <Select
+                value={flag.Flag.toString()}
+                onValueChange={(value) => {
+                  const newFlags = [...(data.flags || [])];
+                  newFlags[index] = { ...flag, Flag: value === 'true' };
+                  onChange({ flags: newFlags });
+                }}
+              >
+                <SelectTrigger className="w-[100px] bg-gray-800 border-gray-700">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="true">True</SelectItem>
+                  <SelectItem value="false">False</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  const newFlags = data.flags.filter((_: any, i: number) => i !== index);
+                  onChange({ flags: newFlags });
+                }}
+                className="h-8 w-8 text-gray-400 hover:text-gray-200"
+              >
+                <XIcon className="w-4 h-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      </div>
     </>
   );
 }
