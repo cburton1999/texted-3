@@ -82,15 +82,13 @@ function LocationProperties({ data, onChange, game }: { data: any; onChange: (up
   );
 }
 
-interface PropertiesPanelProps {
-  node: Node;
-  onClose: () => void;
-  onDelete: (nodeId: string) => void;
-  onChange: (nodeId: string, data: any) => void;
-  game: Game;
-}
-
 function FocalPointProperties({ data, onChange, game }: { data: any; onChange: (updates: any) => void; game: Game }) {
+  const [flags, setFlags] = useState(data.flags || []);
+
+  useEffect(() => {
+    onChange({ flags });
+  }, [flags, onChange]);
+
   return (
     <>
       <div>
@@ -116,44 +114,29 @@ function FocalPointProperties({ data, onChange, game }: { data: any; onChange: (
         />
       </div>
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className="block text-sm font-medium text-gray-300">Flags</label>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              onChange({
-                flags: [...(data.flags || []), { Name: '', Flag: true }]
-              });
-            }}
-            className="text-gray-400 hover:text-gray-200"
-          >
-            <Plus className="w-4 h-4 mr-1" />
-            Add Flag
-          </Button>
-        </div>
+        <label className="block text-sm font-medium mb-1.5 text-gray-300">Flags</label>
         <div className="space-y-2">
-          {data.flags?.map((flag: any, index: number) => (
-            <div key={index} className="flex items-center gap-2 bg-gray-800/50 p-2 rounded-lg">
+          {flags.map((flag: any, index: number) => (
+            <div key={index} className="flex items-center gap-2">
               <Input
                 value={flag.Name}
                 onChange={(e) => {
-                  const newFlags = [...(data.flags || [])];
+                  const newFlags = [...flags];
                   newFlags[index] = { ...flag, Name: e.target.value };
-                  onChange({ flags: newFlags });
+                  setFlags(newFlags);
                 }}
                 placeholder="Flag name"
-                className="flex-1 bg-gray-800 border-gray-700 text-gray-200"
+                className="bg-gray-900 border-gray-700 text-gray-200"
               />
               <Select
                 value={flag.Flag.toString()}
                 onValueChange={(value) => {
-                  const newFlags = [...(data.flags || [])];
+                  const newFlags = [...flags];
                   newFlags[index] = { ...flag, Flag: value === 'true' };
-                  onChange({ flags: newFlags });
+                  setFlags(newFlags);
                 }}
               >
-                <SelectTrigger className="w-[100px] bg-gray-800 border-gray-700">
+                <SelectTrigger className="w-[100px] bg-gray-900 border-gray-700">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -165,15 +148,25 @@ function FocalPointProperties({ data, onChange, game }: { data: any; onChange: (
                 variant="ghost"
                 size="icon"
                 onClick={() => {
-                  const newFlags = data.flags.filter((_: any, i: number) => i !== index);
-                  onChange({ flags: newFlags });
+                  setFlags(flags.filter((_, i) => i !== index));
                 }}
-                className="h-8 w-8 text-gray-400 hover:text-gray-200"
+                className="h-8 w-8"
               >
                 <XIcon className="w-4 h-4" />
               </Button>
             </div>
           ))}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setFlags([...flags, { Name: '', Flag: false }]);
+            }}
+            className="w-full text-gray-400 hover:text-gray-200"
+          >
+            <Plus className="w-4 h-4 mr-1" />
+            Add Flag
+          </Button>
         </div>
       </div>
     </>
@@ -371,7 +364,7 @@ function EventProperties({ data, onChange, game }: { data: any; onChange: (updat
                 }}
               >
                 <SelectTrigger className="bg-gray-900 border-gray-700">
-                  <SelectValue placeholder="Select item to take..." />
+                  <SelectValue placeholder="Select item to remove..." />
                 </SelectTrigger>
                 <SelectContent>
                   {game.Items.map((item) => (
@@ -751,6 +744,14 @@ function CustomEventProperties({ data, onChange, game }: { data: any; onChange: 
       </div>
     </div>
   );
+}
+
+interface PropertiesPanelProps {
+  node: Node;
+  onClose: () => void;
+  onDelete: (nodeId: string) => void;
+  onChange: (nodeId: string, data: any) => void;
+  game: Game;
 }
 
 export function PropertiesPanel({ node, onClose, onDelete, onChange, game }: PropertiesPanelProps) {
