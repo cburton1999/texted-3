@@ -1,5 +1,10 @@
 "use client";
 
+export const metadata = {
+  title: 'Texted Uk - Game Editor',
+  description: 'Create your own text adventure games with our visual editor. Design locations, items, and custom commands in an intuitive interface.',
+};
+
 import { useState } from 'react';
 import { Game, Map, Location, FocalPoint, Item, Event, Action, CommandAlias } from '@/lib/types/game';
 import { Input } from '@/components/ui/input';
