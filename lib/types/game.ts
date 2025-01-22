@@ -72,6 +72,7 @@ export interface FocalPoint {
 }
 
 export interface Location {
+  LocationId: string;
   Name: string;
   Description: string;
   Items: string[];  // Array of item IDs that are present in this location
@@ -95,14 +96,21 @@ export interface Map {
 }
 
 export interface Game {
+  Details: GameDetails,
   Items: Item[];
   Maps: Map[];
   CustomCommands?: CommandAlias[];
 }
 
+export interface GameDetails {
+  Name: string,
+  Description: string,
+  SpawnId: string
+}
+
 export interface GameState {
   currentMap: number;
-  currentLocation: number;
+  currentLocation: Location;
   inventory: string[];
   flags: Record<string, boolean>;
   spawnedItems: Record<string, boolean>; // Track which items are spawned in the world

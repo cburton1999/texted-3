@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { toast } from 'sonner';
 import dynamic from 'next/dynamic';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@radix-ui/react-select';
 
 const FlowEditor = dynamic(
   () => import('@/components/FlowEditor').then((mod) => mod.FlowEditor),
@@ -199,6 +200,63 @@ export function GameEditor({ game, onChange }: GameEditorProps) {
     <div className="flex h-[calc(100vh-73px)] overflow-hidden">
       <div className="w-72 bg-gray-900 border-r border-gray-800 flex flex-col">
         <div className="p-4 border-b border-gray-800">
+          <h3 className="text-lg font-semibold text-gray-300">Game Details</h3>
+          <p className="text-sm text-gray-400 mt-1">Mange the details of uyour game</p>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+          <div>
+            <label className="block text-sm font-medium mb-1.5 text-gray-300">Game Name</label>
+            
+            <Input
+              value={game.Details.Name}
+              onChange={(e) => {
+                const newValue = e.target.value;
+
+                var newDetails = game.Details;
+                newDetails.Name = newValue;
+
+                onChange({ ...game, Details: newDetails });
+              }}
+              className="bg-gray-800 border-gray-700 text-gray-200"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1.5 text-gray-300">Description</label>
+            
+            <Textarea
+              value={game.Details.Description}
+              onChange={(e) => {
+                const newValue = e.target.value;
+
+                var newDetails = game.Details;
+                newDetails.Description = newValue;
+
+                onChange({ ...game, Details: newDetails });
+              }}
+              className="bg-gray-800 border-gray-700 text-gray-200"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1.5 text-gray-300">Spawn Location</label>
+            
+            <Input
+              value={game.Details.SpawnId}
+              onChange={(e) => {
+                const newValue = e.target.value;
+
+                var newDetails = game.Details;
+                newDetails.SpawnId = newValue;
+
+                onChange({ ...game, Details: newDetails });
+              }}
+              className="bg-gray-800 border-gray-700 text-gray-200" ></Input>
+          </div>
+        </div>
+        
+        <div className="p-4 border-b border-gray-800">
           <h3 className="text-lg font-semibold text-gray-300">Components</h3>
           <p className="text-sm text-gray-400 mt-1">Drag components to the canvas</p>
         </div>
@@ -224,18 +282,6 @@ export function GameEditor({ game, onChange }: GameEditorProps) {
             onClick={() => handleComponentClick('event')}
             color="text-yellow-500"
           />
-          
-          <div className="mt-6 pt-6 border-t border-gray-800">
-            <div className="text-sm text-gray-400">
-              <p className="mb-2">Tips:</p>
-              <ul className="space-y-1 list-disc pl-4">
-                <li>Click on a node to edit its properties</li>
-                <li>Connect nodes by dragging between them</li>
-                <li>Events must be connected to focal points</li>
-                <li>Right-click a focal point to add custom commands</li>
-              </ul>
-            </div>
-          </div>
         </div>
       </div>
       

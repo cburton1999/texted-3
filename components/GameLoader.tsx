@@ -1,5 +1,6 @@
 "use client";
 
+import { Game } from '@/lib/types/game';
 import { Upload } from 'lucide-react';
 
 export default function GameLoader() {
@@ -10,12 +11,18 @@ export default function GameLoader() {
         onChange={(e) => {
           const file = e.target.files?.[0];
           if (file) {
-            localStorage.setItem('selectedGameFile', file.name);
+            
             const reader = new FileReader();
             reader.onload = (e) => {
               const content = e.target?.result;
               if (typeof content === 'string') {
                 localStorage.setItem('loadedGame', content);
+
+                var game: Game = JSON.parse(content);
+                
+                localStorage.setItem('selectedGameFile', game.Details?.Name);
+                localStorage.setItem('SelectedGameDescription', game.Details?.Description);
+
                 window.location.reload();
               }
             };

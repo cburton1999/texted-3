@@ -15,6 +15,11 @@ import templateGame from '@/lib/template-game';
 
 export default function EditorPage() {
   const [game, setGame] = useState<Game>({
+    Details: {
+      Name: "Default Game",
+      Description: "This is the default description",
+      SpawnId: "Location_1",
+    },
     Items: [],
     Maps: [],
     CustomCommands: []
@@ -78,7 +83,7 @@ export default function EditorPage() {
       try {
         const content = e.target?.result;
         if (typeof content === 'string') {
-          const loadedGame = JSON.parse(content);
+          const loadedGame: Game = JSON.parse(content);
           // Basic validation to ensure the file has the required structure
           if (Array.isArray(loadedGame.Items) && Array.isArray(loadedGame.Maps)) {
             // Ensure all required arrays exist
@@ -103,6 +108,8 @@ export default function EditorPage() {
               }))
             }));
             setGame(loadedGame);
+            window.localStorage.setItem("selectedGameFile", loadedGame.Details?.Name)
+            
           } else {
             alert('Invalid game file format');
           }

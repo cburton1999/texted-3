@@ -33,13 +33,12 @@ export default function GameInterface() {
         console.error('Error parsing saved game:', error);
       }
     }
-    
     setGameEngine(new GameEngine(gameData));
   }, []);
 
   useEffect(() => {
     if (gameEngine && !gameStarted) {
-      const currentMap = gameEngine.getCurrentLocation();
+      const currentMap = gameEngine.state.currentLocation;
       const gameName = window.localStorage.getItem('selectedGameFile') || 'Default Game';
       setMessages([
         `Loading "${gameName}"...`,
@@ -79,7 +78,7 @@ export default function GameInterface() {
         <div className="terminal-content max-w-4xl mx-auto">
           <Card className="bg-transparent border-2 border-green-500 p-8">
             <div className="text-center mb-8">
-              <h1 className="terminal-text text-4xl mb-4">ROBCO INDUSTRIES</h1>
+              <h1 className="terminal-text text-4xl mb-4">COBIN INDUSTRIES</h1>
               <p className="terminal-text text-xl">TERMINAL INTERFACE v2.5.0</p>
             </div>
             
@@ -165,7 +164,7 @@ export default function GameInterface() {
               <div>
                 <h3 className="terminal-text text-lg mb-2">Custom Commands</h3>
                 <ul className="space-y-1">
-                  {gameEngine.getCurrentLocation().FoculPoints.flatMap(point => 
+                  {gameEngine.state.currentLocation.FoculPoints.flatMap(point => 
                     point.Events
                       .filter(event => typeof event.Event === 'string' && event.Event.startsWith('custom-'))
                       .map(event => event.Event.replace('custom-', ''))
@@ -195,16 +194,17 @@ export default function GameInterface() {
         <Card className="bg-transparent border-2 border-green-500">
           <div className="terminal-header flex justify-between items-center p-4">
             <span className="terminal-text font-mono">
-              ROBCO INDUSTRIES UNIFIED OPERATING SYSTEM
+              COBIN INDUSTRIES UNIFIED OPERATING SYSTEM
               <br />
-              COPYRIGHT 2075-2077 ROBCO INDUSTRIES
+              COPYRIGHT 2075-2077 COBIN INDUSTRIES
               <br />
-              - {window.localStorage.getItem('selectedGameFile')} -
+              {window.localStorage.getItem('selectedGameFile')} - {window.localStorage.getItem('SelectedGameDescription')} 
             </span>
             <Button
               onClick={() => {
                 window.localStorage.removeItem('loadedGame');
                 window.localStorage.removeItem('selectedGameFile');
+
                 window.location.reload();
               }}
               className="bg-transparent border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-black transition-colors font-mono uppercase"

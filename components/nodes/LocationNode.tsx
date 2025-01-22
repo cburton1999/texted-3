@@ -31,7 +31,7 @@ export const LocationNode = memo(({ data, isConnectable, selected }: any) => {
             <div className="flex items-center gap-2 mb-2">
               <Box className="w-4 h-4 text-emerald-500" />
               <div className="text-sm font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                {data.label}
+              {data.locationId} - {data.label}
                 <ChevronRight 
                   className={`w-4 h-4 text-gray-500 transition-transform ${data.expanded ? 'rotate-90' : ''}`}
                 />

@@ -2,13 +2,14 @@ import { Game, GameState, Action, EVENT_TYPES, CommandAlias } from './types/game
 
 export class GameEngine {
   public game: Game;
-  private state: GameState;
+  public state: GameState;
 
   constructor(game: Game) {
     this.game = game;
+
     this.state = {
       currentMap: 0,
-      currentLocation: 0,
+      currentLocation: game.Maps[0].Locations.find(location => location.LocationId == game.Details?.SpawnId) || game.Maps[0].Locations[0],
       inventory: [],
       flags: {},
       spawnedItems: this.initializeSpawnedItems(),
@@ -30,13 +31,25 @@ export class GameEngine {
     return spawnedItems;
   }
 
-  public getCurrentLocation() {
-    const location = this.game.Maps[this.state.currentMap].Locations[this.state.currentLocation];
-    return {
-      ...location,
-      Items: location.Items?.filter(itemId => this.state.spawnedItems[itemId]) || []
-    };
-  }
+  // public getCurrentLocation() {
+  //   var location = this.game.Maps[this.state.currentMap].Locations.find(location => location.LocationId == this.state.currentLocation)
+
+  //   if (location === undefined || location == null) {
+  //     location = this.game.Maps[this.state.currentMap].Locations[0];
+  //     this.state.currentLocation = location.LocationId;
+  //   }
+
+  //   var items: string[] = [];
+
+  //   if (location!.Items !== undefined) {
+  //       items = location!.Items?.filter(itemId => this.state.spawnedItems[itemId]);
+  //   }
+
+  //   return {
+  //     ...location,
+  //     Items: items
+  //   };
+  // }
 
   public getInventory() {
     return this.state.inventory.map(itemId => 
@@ -45,7 +58,8 @@ export class GameEngine {
   }
 
   public getSpawnedItems() {
-    const location = this.getCurrentLocation();
+    const location = this.state.currentLocation;
+
     return (location.Items || [])
       .filter(itemId => this.state.spawnedItems[itemId])
       .map(itemId => this.game.Items.find(item => item.Id === itemId))
@@ -53,7 +67,8 @@ export class GameEngine {
   }
 
   public getFocalPoints() {
-    const location = this.getCurrentLocation();
+    const location = this.state.currentLocation
+
     return location.FoculPoints.filter(point => {
       // If there are no flags, the focal point is always visible
       if (!point.Flags || point.Flags.length === 0) {
@@ -190,10 +205,10 @@ export class GameEngine {
     const visiblePoints = this.getFocalPoints();
     const visibleItems = this.getSpawnedItems();
     const words = target ? [verb, ...target.split(/\s+/)] : [verb];
+    const location = this.state.currentLocation;
 
     switch (verb) {
       case 'look': {
-        const location = this.getCurrentLocation();
         messages.push(location.Description);
         
         if (visiblePoints.length > 0) {
@@ -246,7 +261,9 @@ export class GameEngine {
       
       case 'move': {
         const availableLocations = this.getAvailableLocations();
-        
+
+        console.log("MOVE", target, availableLocations);
+
         if (!target) {
           if (availableLocations.length === 0) {
             messages.push("There's nowhere you can go from here.");
@@ -257,13 +274,12 @@ export class GameEngine {
             });
           }
         } else {
-          const targetName = target.toLowerCase();
-          const target = availableLocations.find(
-            loc => loc.name.toLowerCase() === targetName
+          const locationToMove = availableLocations.find(
+            loc => loc.name.toLowerCase() === target
           );
           
-          if (target) {
-            messages.push(...this.moveToLocation(target.index));
+          if (locationToMove) {
+            messages.push(...this.moveToLocation(locationToMove?.locationId));
           } else {
             messages.push("You can't go there from here.");
           }
@@ -389,7 +405,7 @@ export class GameEngine {
   public executeItemUse(itemId: string, targetId: string | null, focalPointIndex: number | null): string[] {
     const messages: string[] = [];
     const item = this.game.Items.find(item => item.Id === itemId);
-    
+    const location = this.state.currentLocation;
     if (!item) {
       messages.push("That item doesn't exist.");
       return messages;
@@ -428,7 +444,6 @@ export class GameEngine {
         return messages;
       }
 
-      const location = this.getCurrentLocation();
       for (const focalPoint of location.FoculPoints) {
         const event = focalPoint.Events.find(
           event => event.Event === EVENT_TYPES.USE_WITH_ITEM && 
@@ -449,6 +464,7 @@ export class GameEngine {
 
   private executeAction(action: Action): string[] {
     const messages: string[] = [];
+    const currentLocation = this.state.currentLocation;
     
     switch (action.Event) {
       case 0: // Display message
@@ -456,13 +472,15 @@ export class GameEngine {
         break;
       case 1: // Add item
         this.state.spawnedItems[action.Arguments[0]] = true;
-        const currentLocation = this.game.Maps[this.state.currentMap].Locations[this.state.currentLocation];
-        if (!currentLocation.Items) {
-          currentLocation.Items = [];
+       
+        if (!currentLocation!.Items) {
+          currentLocation!.Items = [];
         }
-        if (!currentLocation.Items.includes(action.Arguments[0])) {
-          currentLocation.Items.push(action.Arguments[0]);
+        if (!currentLocation!.Items.includes(action.Arguments[0])) {
+          currentLocation!.Items.push(action.Arguments[0]);
         }
+
+        console.log("Add item", currentLocation);
         break;
       case 2: // Remove item
         this.state.inventory = this.state.inventory.filter(
@@ -470,7 +488,9 @@ export class GameEngine {
         );
         break;
       case 3: // Move to location
-        this.state.currentLocation = parseInt(action.Arguments[0]);
+        this.state.currentLocation = this.game.Maps[this.state.currentMap].Locations.find(location => location.LocationId == action.Arguments[0])!;
+
+        messages.push(this.state.currentLocation.Description);
         break;
       case 4: // Set flag
         this.state.flags[action.Arguments[0]] = action.Arguments[1] === 'true';
@@ -480,9 +500,9 @@ export class GameEngine {
     return messages;
   }
 
-  public getAvailableLocations(): { index: number; name: string; description: string; }[] {
-    const currentLocation = this.getCurrentLocation();
-    const availableLocations: { index: number; name: string; description: string; }[] = [];
+  public getAvailableLocations(): {  name: string; description: string; locationId: string }[] {
+    const currentLocation = this.state.currentLocation
+    const availableLocations: { name: string; description: string; locationId: string }[] = [];
 
     currentLocation.FoculPoints.forEach(point => {
       if (point.Flags && point.Flags.length > 0) {
@@ -495,12 +515,14 @@ export class GameEngine {
       point.Events.forEach(event => {
         event.Actions.forEach(action => {
           if (action.Event === 3) {
-            const locationIndex = parseInt(action.Arguments[0]);
-            const targetLocation = this.game.Maps[this.state.currentMap].Locations[locationIndex];
+            const locationId = action.Arguments[0];
+            const targetLocation = this.game.Maps[this.state.currentMap].Locations.find(location => location.LocationId == locationId);
+            
+            if (targetLocation)
             availableLocations.push({
-              index: locationIndex,
               name: targetLocation.Name,
-              description: point.Name
+              description: point.Name,
+              locationId: targetLocation.LocationId
             });
           }
         });
@@ -510,19 +532,19 @@ export class GameEngine {
     return availableLocations;
   }
 
-  public moveToLocation(locationIndex: number): string[] {
+  public moveToLocation(locationName: string): string[] {
     const messages: string[] = [];
     const availableLocations = this.getAvailableLocations();
-    const targetLocation = availableLocations.find(loc => loc.index === locationIndex);
+    const targetLocation = availableLocations.find(loc => loc.name === locationName);
 
     if (!targetLocation) {
       messages.push("You can't go there from here.");
       return messages;
     }
 
-    this.state.currentLocation = locationIndex;
-    const newLocation = this.getCurrentLocation();
-    messages.push(`\nLocation: ${newLocation.Name}\n${newLocation.Description}`);
+    this.state.currentLocation = this.game.Maps[this.state.currentMap].Locations.find(location => location.Name == targetLocation.name)!;
+
+    messages.push(`\nLocation: ${this.state.currentLocation.Name}\n${this.state.currentLocation.Description}`);
 
     return messages;
   }

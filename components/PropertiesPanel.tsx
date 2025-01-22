@@ -10,8 +10,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { X as XIcon, Plus, Trash2, Command } from 'lucide-react';
 
 function LocationProperties({ data, onChange, game }: { data: any; onChange: (updates: any) => void; game: Game }) {
+  console.log(data);
+
   return (
     <>
+      <div>
+        <label className="block text-sm font-medium mb-1.5 text-gray-300">Location Id (Must Be Unique)</label>
+        <Input
+          value={data.locationId}
+          onChange={(e) => {
+            const newValue = e.target.value;
+            onChange({ locationId: newValue });
+          }}
+          className="bg-gray-800 border-gray-700 text-gray-200"
+        />
+      </div>
       <div>
         <label className="block text-sm font-medium mb-1.5 text-gray-300">Name</label>
         <Input
@@ -250,6 +263,7 @@ function EventProperties({ data, onChange, game }: { data: any; onChange: (updat
           </Select>
         </div>
       )}
+      
 
       <div className="space-y-4">
         <div className="flex justify-between items-center">
@@ -262,6 +276,7 @@ function EventProperties({ data, onChange, game }: { data: any; onChange: (updat
                 Event: ACTION_TYPES.DISPLAY_MESSAGE,
                 Arguments: ['']
               }];
+
               updateEvent({ Actions: newActions });
             }}
             className="text-gray-400 hover:text-gray-200"
@@ -325,6 +340,38 @@ function EventProperties({ data, onChange, game }: { data: any; onChange: (updat
                 rows={2}
               />
             )}
+
+
+            {action.Event === ACTION_TYPES.MOVE_LOCATION && (
+              <Select
+                value={action.Arguments[0] || ''}
+                onValueChange={(locationonId) => {
+                  const newActions = [...event.Actions];
+                  
+                  newActions[actionIndex] = {
+                    ...action,
+                    Arguments: [locationonId]
+                  };
+                  
+
+                  console.log(newActions[actionIndex])
+                  updateEvent({ Actions: newActions });
+                }}
+              >
+                <SelectTrigger className="bg-gray-900 border-gray-700">
+                  <SelectValue placeholder="Select a location to move to" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  {game.Maps[0].Locations.map((item) => (
+                    <SelectItem key={item.LocationId} value={item.LocationId}>
+                      {item.LocationId}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+
 
             {action.Event === ACTION_TYPES.ADD_ITEM && (
               <Select
@@ -762,6 +809,7 @@ export function PropertiesPanel({ node, onClose, onDelete, onChange, game }: Pro
   }, [node.data]);
 
   const handleSave = () => {
+    console.log(node.id, localData)
     onChange(node.id, localData);
     onClose();
   };

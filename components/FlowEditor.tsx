@@ -231,12 +231,18 @@ function Flow({ map, game, onChange, mapIndex, onNodeSelect, selectedNode }: Flo
         if (!updatedMap.Locations) {
           updatedMap.Locations = [];
         }
+
+        console.log("New Data", newData);
+
         updatedMap.Locations[locationIndex] = {
           ...updatedMap.Locations[locationIndex],
           Name: newData.label,
           Description: newData.description,
+          LocationId: newData.locationId,
           Items: newData.items || []
         };
+
+        console.log("New data - after",  updatedMap.Locations[locationIndex])
         break;
       case 'focalPoint':
         if (!updatedMap.Locations?.[locationIndex]?.FoculPoints) {
@@ -284,6 +290,7 @@ function Flow({ map, game, onChange, mapIndex, onNodeSelect, selectedNode }: Flo
         type: 'location',
         position: locPosition,
         data: { 
+          locationId: location.LocationId,
           label: location.Name,
           expanded: expandedLocations.has(locationNodeId),
           onToggleExpand: () => {
@@ -549,6 +556,7 @@ function Flow({ map, game, onChange, mapIndex, onNodeSelect, selectedNode }: Flo
     [setEdges, nodes, map, updateMap, setNodes]
   );
 
+  console.log("Selected node ", selectedNode);
   return (
     <div className="flex-1 h-[calc(100vh-130px)]">
       <ReactFlow
