@@ -13,10 +13,10 @@ export interface Action {
 }
 
 export const EVENT_TYPES = {
-  EXAMINE: 1,
+  INVESTIGATE: 1,
   INTERACT: 2,
   USE_ITEM: 3,
-  USE_WITH_ITEM: 4
+  USE_WITH_ITEM: 4,
 } as const;
 
 export const ACTION_TYPES = {
@@ -28,7 +28,7 @@ export const ACTION_TYPES = {
 } as const;
 
 export const EVENT_TYPE_NAMES: Record<number, string> = {
-  [EVENT_TYPES.EXAMINE]: "When Examined",
+  [EVENT_TYPES.INVESTIGATE]: "When Investigated",
   [EVENT_TYPES.INTERACT]: "When Interacted With",
   [EVENT_TYPES.USE_ITEM]: "When Used On This",
   [EVENT_TYPES.USE_WITH_ITEM]: "When Used With Another Item"

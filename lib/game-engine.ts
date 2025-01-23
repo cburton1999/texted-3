@@ -197,7 +197,7 @@ export class GameEngine {
   }
 
   private isStandardCommand(verb: string): boolean {
-    return ['look', 'examine', 'interact', 'move', 'inventory', 'use', 'take', 'help'].includes(verb);
+    return ['look', 'examine', 'interact', 'inventory', 'use', 'take', 'investigate'].includes(verb);
   }
 
   private executeStandardCommand(verb: string, target: string, command?: string): string[] {
@@ -227,10 +227,32 @@ export class GameEngine {
         break;
       }
 
+      case 'investigate':
+        const targetIndex = visiblePoints.findIndex(
+          point => point.Name.toLowerCase() === target.toLowerCase()
+        );
+
+        if (targetIndex !== -1) {
+          const point = visiblePoints[targetIndex];
+          const investigateEvent = point.Events.find(event => event.Event === EVENT_TYPES.INVESTIGATE);
+
+          if (investigateEvent) {
+            const eventIndex = point.Events.indexOf(investigateEvent);
+            messages.push(...this.executeEvent(targetIndex, eventIndex));
+            console.log("Investigated", targetIndex, point, investigateEvent, eventIndex);
+          } else {
+            messages.push("Nothing happens.");
+          }
+        } else {
+          messages.push("You don't see that here.");
+        }
+
+        break;
       case 'examine': {
         const focalPoint = visiblePoints.find(
           point => point.Name.toLowerCase() === target.toLowerCase()
         );
+
         if (focalPoint) {
           messages.push(focalPoint.Description);
         } else {
@@ -259,23 +281,22 @@ export class GameEngine {
         break;
       }
       
-      case 'move': {
+      case 'move-deleted': {
         const availableLocations = this.getAvailableLocations();
-
-        console.log("MOVE", target, availableLocations);
 
         if (!target) {
           if (availableLocations.length === 0) {
             messages.push("There's nowhere you can go from here.");
           } else {
             messages.push("You can go to:");
+
             availableLocations.forEach(loc => {
               messages.push(`- ${loc.name} (via ${loc.description})`);
             });
           }
         } else {
           const locationToMove = availableLocations.find(
-            loc => loc.name.toLowerCase() === target
+            loc => loc.name.toLowerCase() === target.toLowerCase()
           );
           
           if (locationToMove) {
@@ -283,6 +304,8 @@ export class GameEngine {
           } else {
             messages.push("You can't go there from here.");
           }
+
+          console.log(locationToMove, availableLocations);
         }
         break;
       }
@@ -297,11 +320,6 @@ export class GameEngine {
             if (item) messages.push(`- ${item.Name}`);
           });
         }
-        break;
-      }
-
-      case 'help': {
-        messages.push(HELP_TEXT);
         break;
       }
       
@@ -490,6 +508,7 @@ export class GameEngine {
       case 3: // Move to location
         this.state.currentLocation = this.game.Maps[this.state.currentMap].Locations.find(location => location.LocationId == action.Arguments[0])!;
 
+        messages.push("Location: " + this.state.currentLocation.Name);
         messages.push(this.state.currentLocation.Description);
         break;
       case 4: // Set flag
@@ -566,16 +585,3 @@ export class GameEngine {
     this.state = { ...state };
   }
 }
-
-const HELP_TEXT = `Available commands:
-  look - Look around the current location
-  examine [object] - Examine an object closely
-  interact [object] - Interact with an object
-  move - List available locations to move to
-  move [location] - Move to a specific location
-  inventory - Check your inventory
-  use [item] on [object] - Use an item on an object
-  take [item] - Take an item
-  help - Show this help message
-
-Custom commands are available for certain objects - try different verbs!`;

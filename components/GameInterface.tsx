@@ -45,7 +45,6 @@ export default function GameInterface() {
         gameEngine.game.Maps[0].Introduction,
         `\nLocation: ${currentMap.Name}\n${currentMap.Description}`,
         '',
-        'Type "help" for available commands.',
       ]);
       setGameStarted(true);
     }
@@ -124,22 +123,22 @@ export default function GameInterface() {
           <div className="p-4 space-y-4">
             <div>
               <h3 className="terminal-text text-lg mb-2">Standard Commands</h3>
-              <ul className="space-y-1">
+              <ul className="space-y-4">
                 <li className="terminal-text text-sm">
                   <div className="font-bold">look</div>
                   <div className="text-xs opacity-80">Look around the current location to see what's here</div>
                 </li>
                 <li className="terminal-text text-sm">
                   <div className="font-bold">examine [object]</div>
-                  <div className="text-xs opacity-80">Look at something more closely to get details</div>
+                  <div className="text-xs opacity-80">Glance at an object to get details</div>
+                </li>
+                <li className="terminal-text text-sm">
+                  <div className="font-bold">investigate [object]</div>
+                  <div className="text-xs opacity-80">Analyse an object to gain greater insight </div>
                 </li>
                 <li className="terminal-text text-sm">
                   <div className="font-bold">interact [object]</div>
                   <div className="text-xs opacity-80">Interact with an object in the environment</div>
-                </li>
-                <li className="terminal-text text-sm">
-                  <div className="font-bold">move [location]</div>
-                  <div className="text-xs opacity-80">Move to a new location, or just 'move' to see where you can go</div>
                 </li>
                 <li className="terminal-text text-sm">
                   <div className="font-bold">inventory</div>
@@ -163,7 +162,7 @@ export default function GameInterface() {
             {gameEngine && (
               <div>
                 <h3 className="terminal-text text-lg mb-2">Custom Commands</h3>
-                <ul className="space-y-1">
+                <ul className="space-y-4">
                   {gameEngine.state.currentLocation.FoculPoints.flatMap(point => 
                     point.Events
                       .filter(event => typeof event.Event === 'string' && event.Event.startsWith('custom-'))
@@ -197,6 +196,7 @@ export default function GameInterface() {
               COBIN INDUSTRIES UNIFIED OPERATING SYSTEM
               <br />
               COPYRIGHT 2075-2077 COBIN INDUSTRIES
+              <br />
               <br />
               {window.localStorage.getItem('selectedGameFile')} - {window.localStorage.getItem('SelectedGameDescription')} 
             </span>
