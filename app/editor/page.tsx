@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Download, ArrowLeft, Upload, Box, Map as MapIcon, Boxes, Package, BookTemplate as FileTemplate, HelpCircle, Command, X as XIcon } from 'lucide-react';
+import { Plus, Download, ArrowLeft, Upload, Box, Map as MapIcon, Boxes, Package, BookTemplate as FileTemplate, HelpCircle, Command, X as XIcon, CommandIcon } from 'lucide-react';
 import Link from 'next/link';
 import { GameEditor } from '@/components/GameEditor';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -109,7 +109,7 @@ export default function EditorPage() {
             }));
             setGame(loadedGame);
             window.localStorage.setItem("selectedGameFile", loadedGame.Details?.Name)
-            
+
           } else {
             alert('Invalid game file format');
           }
@@ -125,7 +125,7 @@ export default function EditorPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-100 pb-24">
+    <div className="min-h-screen bg-gray-950 text-gray-100">
       <div className="border-b border-gray-800 bg-gray-900/95 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-[2000px] mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -135,91 +135,32 @@ export default function EditorPage() {
             <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
               Game Editor
             </h1>
-            <Button
-              onClick={() => setGame(templateGame)}
-              className="ml-4 bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-lg"
-            >
-              <FileTemplate className="w-4 h-4 mr-2" />
-              Load Template
-            </Button>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button 
-                  className="ml-2 bg-gray-800 hover:bg-gray-700 text-gray-100 border border-gray-700 hover:border-gray-600"
-                >
-                  <HelpCircle className="w-4 h-4 mr-2" />
-                  Help
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-gray-900 border border-gray-800">
-                <DialogHeader>
-                  <DialogTitle className="text-xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
-                    Tips & Best Practices
-                  </DialogTitle>
-                </DialogHeader>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                    <h4 className="font-medium bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent mb-2">
-                      Game Structure
-                    </h4>
-                    <ul className="list-disc list-inside space-y-1 text-sm text-gray-300">
-                      <li>Start with a strong introduction that sets up the story and player objectives</li>
-                      <li>Create a logical flow between locations using descriptive focal points</li>
-                      <li>Balance puzzle difficulty with clear hints in item and location descriptions</li>
-                      <li>Use the visual node editor to plan and visualize game flow</li>
-                    </ul>
-                  </div>
 
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                    <h4 className="font-medium bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent mb-2">
-                      Items & Interactions
-                    </h4>
-                    <ul className="list-disc list-inside space-y-1 text-sm text-gray-300">
-                      <li>Give items unique, descriptive IDs that match their purpose (e.g., "old_key", "ritual_book")</li>
-                      <li>Create multi-step puzzles using item combinations and focal point interactions</li>
-                      <li>Use the "examine" command to provide additional clues through detailed descriptions</li>
-                      <li>Consider adding red herrings and optional items to encourage exploration</li>
-                    </ul>
-                  </div>
+            <div>
+              <Button
+                onClick={() => setActiveTab("maps")}
+                className="ml-4 bg-blue-600 hover:bg-emerald-700 transition-colors shadow-lg"
+              >
+                <MapIcon className="w-4 h-4 mr-2" />
+                Maps
+              </Button>
 
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                    <h4 className="font-medium bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent mb-2">
-                      Events & Actions
-                    </h4>
-                    <ul className="list-disc list-inside space-y-1 text-sm text-gray-300">
-                      <li>Chain events together using flags to create complex sequences</li>
-                      <li>Provide clear feedback messages for all player actions</li>
-                      <li>Use conditional events to change the game state based on player choices</li>
-                      <li>Test all possible interaction combinations to prevent dead ends</li>
-                    </ul>
-                  </div>
+              <Button
+                onClick={() => setActiveTab("commands")}
+                className="ml-4 bg-blue-600 hover:bg-emerald-700 transition-colors shadow-lg"
+              >
+                <CommandIcon className="w-4 h-4 mr-2" />
+                Commands
+              </Button>
 
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                    <h4 className="font-medium bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent mb-2">
-                      Testing & Polish
-                    </h4>
-                    <ul className="list-disc list-inside space-y-1 text-sm text-gray-300">
-                      <li>Save your game frequently using the "Save Game" button</li>
-                      <li>Test the game from a new player's perspective using the terminal interface</li>
-                      <li>Ensure all commands (look, examine, interact, move, inventory, use, take) work as expected</li>
-                      <li>Add atmospheric descriptions to enhance immersion</li>
-                    </ul>
-                  </div>
-
-                  <div className="md:col-span-2 bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                    <h4 className="font-medium bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent mb-2">
-                      Terminal Interface
-                    </h4>
-                    <ul className="list-disc list-inside space-y-1 text-sm text-gray-300">
-                      <li>Players can use "help" to see all available commands</li>
-                      <li>The terminal supports natural language commands for better immersion</li>
-                      <li>Items can be used with "use [item] on [object]" syntax</li>
-                      <li>Movement between locations uses "move [location]" or just "move" to list options</li>
-                    </ul>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
+              <Button
+                onClick={() => setActiveTab("items")}
+                className="ml-4 bg-blue-600 hover:bg-emerald-700 transition-colors shadow-lg"
+              >
+                <Package className="w-4 h-4 mr-2" />
+                Items
+              </Button>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <div className="relative">
@@ -242,10 +183,10 @@ export default function EditorPage() {
           </div>
         </div>
       </div>
-      
+
       <div className="max-w-[2000px] mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <div className="px-6">
+          {/* <div className="px-6">
             <TabsList className="bg-gray-900/50 border border-gray-800">
               <TabsTrigger 
                 value="items" 
@@ -269,9 +210,9 @@ export default function EditorPage() {
                 Maps
               </TabsTrigger>
             </TabsList>
-          </div>
-          
-          <TabsContent value="items" className="px-6 mt-6">
+          </div> */}
+
+          <TabsContent value="items" className="px-6 mt-2">
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-semibold text-gray-200">Items</h2>
@@ -295,7 +236,7 @@ export default function EditorPage() {
                   Add Item
                 </Button>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {game.Items.map((item, index) => (
                   <div key={index} className="bg-gray-900 border border-gray-800 rounded-lg p-4 space-y-4">
@@ -353,8 +294,8 @@ export default function EditorPage() {
               </div>
             </div>
           </TabsContent>
-          
-          <TabsContent value="commands" className="px-6 mt-6">
+
+          <TabsContent value="commands" className="px-6 mt-2">
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-semibold text-gray-200">Custom Commands</h2>
@@ -381,7 +322,7 @@ export default function EditorPage() {
                   Add Command
                 </Button>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {game.CustomCommands?.map((command, index) => (
                   <div key={index} className="bg-gray-900 border border-gray-800 rounded-lg p-4 space-y-4">
@@ -428,7 +369,7 @@ export default function EditorPage() {
                         </label>
                       </div>
                       <p className="mt-1 text-xs text-gray-400">
-                        {command.RequiresTarget 
+                        {command.RequiresTarget
                           ? "Players must specify a target (e.g., 'kick door', 'search desk')"
                           : "Command works without a target (e.g., 'pray', 'chant', 'meditate')"}
                       </p>
@@ -513,8 +454,8 @@ export default function EditorPage() {
               </div>
             </div>
           </TabsContent>
-          
-          <TabsContent value="maps" className="mt-6">
+
+          <TabsContent value="maps">
             <GameEditor game={game} onChange={setGame} />
           </TabsContent>
         </Tabs>

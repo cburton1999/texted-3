@@ -865,10 +865,17 @@ export function PropertiesPanel({ node, onClose, onDelete, onChange, game }: Pro
         )}
       </div>
 
-      <div className="p-6 border-t border-gray-800 bg-gray-900/50">
+      <div className="border-t border-gray-800 bg-gray-900/50 p-3">
+      <Button
+          className="w-full bg-blue-600 hover:bg-blue-700  mb-2"
+          onClick={handleSave}
+        >
+          Save Changes
+        </Button>
+        
         <Button
           variant="destructive"
-          className="w-full mb-2"
+          className="w-full"
           onClick={() => {
             onDelete(node.id);
             onClose();
@@ -876,12 +883,7 @@ export function PropertiesPanel({ node, onClose, onDelete, onChange, game }: Pro
         >
           Delete {getNodeTypeLabel()}
         </Button>
-        <Button
-          className="w-full bg-blue-600 hover:bg-blue-700"
-          onClick={handleSave}
-        >
-          Save Changes
-        </Button>
+        
       </div>
     </div>
   );

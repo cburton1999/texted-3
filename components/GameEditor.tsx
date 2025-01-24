@@ -12,6 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { toast } from 'sonner';
 import dynamic from 'next/dynamic';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@radix-ui/react-select';
+import { isNode } from 'reactflow';
 
 const FlowEditor = dynamic(
   () => import('@/components/FlowEditor').then((mod) => mod.FlowEditor),
@@ -27,6 +28,8 @@ export function GameEditor({ game, onChange }: GameEditorProps) {
   const [activeMap, setActiveMap] = useState<number | null>(game.Maps.length > 0 ? 0 : null);
   const [selectedNode, setSelectedNode] = useState<any>(null);
   const gameContext = useMemo(() => ({ ...game }), [game]);
+  var [isGameExpaned, setGameExpaned] = useState<boolean>(false);
+  var [isNodesExpanded, setNodeExpanded] = useState<boolean>(false);
 
   const addNewMap = useCallback(() => {
     const newMap: Map = {
@@ -72,9 +75,9 @@ export function GameEditor({ game, onChange }: GameEditorProps) {
         };
         updatedMaps[activeMap].Locations.push(newLocation);
         onChange({ ...game, Maps: updatedMaps });
-        
+
         const newLocationIndex = updatedMaps[activeMap].Locations.length - 1;
-        
+
         setSelectedNode({
           id: locationId,
           type: 'location',
@@ -97,7 +100,7 @@ export function GameEditor({ game, onChange }: GameEditorProps) {
 
         const fpX = selectedNode.position.x + 800;
         const fpY = selectedNode.position.y;
-        
+
         const newFocalPoint: FocalPoint = {
           Name: 'New Focal Point',
           Description: 'Focal point description',
@@ -108,7 +111,7 @@ export function GameEditor({ game, onChange }: GameEditorProps) {
         const mapsWithNewFP = [...game.Maps];
         mapsWithNewFP[activeMap].Locations[locationIndex].FoculPoints.push(newFocalPoint);
         const fpIndex = mapsWithNewFP[activeMap].Locations[locationIndex].FoculPoints.length - 1;
-        
+
         // Create the new node first
         setSelectedNode({
           id: `fp-${locationIndex}-${fpIndex}`,
@@ -122,7 +125,7 @@ export function GameEditor({ game, onChange }: GameEditorProps) {
             description: newFocalPoint.Description
           }
         });
-        
+
         // Then update the game state
         onChange({ ...game, Maps: mapsWithNewFP });
         break;
@@ -135,18 +138,18 @@ export function GameEditor({ game, onChange }: GameEditorProps) {
 
         const eventX = selectedNode.position.x + 800;
         const eventY = selectedNode.position.y;
-        
+
         const newEvent: Event = {
           Event: 1,
           Actions: []
         };
-        
+
         const { locationIndex: eventLocationIndex, fpIndex: eventFpIndex } = selectedNode.data;
-        
+
         const mapsWithNewEvent = [...game.Maps];
         mapsWithNewEvent[activeMap].Locations[eventLocationIndex].FoculPoints[eventFpIndex].Events.push(newEvent);
         const eventIndex = mapsWithNewEvent[activeMap].Locations[eventLocationIndex].FoculPoints[eventFpIndex].Events.length - 1;
-        
+
         // Create the new node first
         setSelectedNode({
           id: `event-${eventLocationIndex}-${eventFpIndex}-${eventIndex}`,
@@ -161,7 +164,7 @@ export function GameEditor({ game, onChange }: GameEditorProps) {
             eventIndex
           }
         });
-        
+
         // Then update the game state
         onChange({ ...game, Maps: mapsWithNewEvent });
         break;
@@ -174,9 +177,9 @@ export function GameEditor({ game, onChange }: GameEditorProps) {
 
         const customEventX = selectedNode.position.x + 800;
         const customEventY = selectedNode.position.y;
-        
+
         const { locationIndex: customEventLocationIndex, fpIndex: customEventFpIndex } = selectedNode.data;
-        
+
         setSelectedNode({
           id: `custom-event-${customEventLocationIndex}-${customEventFpIndex}-${Date.now()}`,
           type: 'customEvent',
@@ -199,92 +202,97 @@ export function GameEditor({ game, onChange }: GameEditorProps) {
   return (
     <div className="flex h-[calc(100vh-73px)] overflow-hidden">
       <div className="w-72 bg-gray-900 border-r border-gray-800 flex flex-col">
-        <div className="p-4 border-b border-gray-800">
-          <h3 className="text-lg font-semibold text-gray-300">Game Details</h3>
-          <p className="text-sm text-gray-400 mt-1">Mange the details of uyour game</p>
+        <div className="p-4 border-b border-gray-800" onClick={() => setGameExpaned(!isGameExpaned)}>
+          <h3 className="text-lg font-semibold text-gray-300">Game Details {isGameExpaned && (<span>&lsaquo;</span>)}  {!isGameExpaned && (<span>&rsaquo;</span>)}</h3>
+          <p className="text-sm text-gray-400 mt-1">Mange the details of your game</p>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
-          <div>
-            <label className="block text-sm font-medium mb-1.5 text-gray-300">Game Name</label>
-            
-            <Input
-              value={game.Details.Name}
-              onChange={(e) => {
-                const newValue = e.target.value;
+        {isGameExpaned && (
+          <div className="flex-1 overflow-y-auto p-4 space-y-2">
+            <div>
+              <label className="block text-sm font-medium mb-1.5 text-gray-300">Game Name</label>
 
-                var newDetails = game.Details;
-                newDetails.Name = newValue;
+              <Input
+                value={game.Details.Name}
+                onChange={(e) => {
+                  const newValue = e.target.value;
 
-                onChange({ ...game, Details: newDetails });
-              }}
-              className="bg-gray-800 border-gray-700 text-gray-200"
-            />
+                  var newDetails = game.Details;
+                  newDetails.Name = newValue;
+
+                  onChange({ ...game, Details: newDetails });
+                }}
+                className="bg-gray-800 border-gray-700 text-gray-200"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1.5 text-gray-300">Description</label>
+              <Textarea
+                value={game.Details.Description}
+                onChange={(e) => {
+                  const newValue = e.target.value;
+
+                  var newDetails = game.Details;
+                  newDetails.Description = newValue;
+
+                  onChange({ ...game, Details: newDetails });
+                }}
+                className="bg-gray-800 border-gray-700 text-gray-200"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1.5 text-gray-300">Spawn Location</label>
+
+              <Input
+                value={game.Details.SpawnId}
+                onChange={(e) => {
+                  const newValue = e.target.value;
+
+                  var newDetails = game.Details;
+                  newDetails.SpawnId = newValue;
+
+                  onChange({ ...game, Details: newDetails });
+                }}
+                className="bg-gray-800 border-gray-700 text-gray-200" ></Input>
+            </div>
           </div>
+        )}
 
-          <div>
-            <label className="block text-sm font-medium mb-1.5 text-gray-300">Description</label>
-            
-            <Textarea
-              value={game.Details.Description}
-              onChange={(e) => {
-                const newValue = e.target.value;
 
-                var newDetails = game.Details;
-                newDetails.Description = newValue;
-
-                onChange({ ...game, Details: newDetails });
-              }}
-              className="bg-gray-800 border-gray-700 text-gray-200"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1.5 text-gray-300">Spawn Location</label>
-            
-            <Input
-              value={game.Details.SpawnId}
-              onChange={(e) => {
-                const newValue = e.target.value;
-
-                var newDetails = game.Details;
-                newDetails.SpawnId = newValue;
-
-                onChange({ ...game, Details: newDetails });
-              }}
-              className="bg-gray-800 border-gray-700 text-gray-200" ></Input>
-          </div>
-        </div>
-        
-        <div className="p-4 border-b border-gray-800">
-          <h3 className="text-lg font-semibold text-gray-300">Components</h3>
+        <div className="p-4 border-b border-gray-800" onClick={() => setNodeExpanded(!isNodesExpanded)}>
+          <h3 className="text-lg font-semibold text-gray-300">Components {isNodesExpanded && (<span>&lsaquo;</span>)}  {!isNodesExpanded && (<span>&rsaquo;</span>)}</h3>
           <p className="text-sm text-gray-400 mt-1">Drag components to the canvas</p>
         </div>
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
-          <ComponentButton
-            icon={<Box className="w-4 h-4" />}
-            label="Location"
-            description="Add a new location to your map"
-            onClick={() => handleComponentClick('location')}
-            color="text-emerald-500"
-          />
-          <ComponentButton
-            icon={<Eye className="w-4 h-4" />}
-            label="Focal Point"
-            description="Add an interactive point to a location"
-            onClick={() => handleComponentClick('focalPoint')}
-            color="text-purple-500"
-          />
-          <ComponentButton
-            icon={<Zap className="w-4 h-4" />}
-            label="Event"
-            description="Add an event to a focal point"
-            onClick={() => handleComponentClick('event')}
-            color="text-yellow-500"
-          />
-        </div>
+
+        {isNodesExpanded && (<>
+          <div className="flex-1 overflow-y-auto p-4 space-y-2">
+            <ComponentButton
+              icon={<Box className="w-4 h-4" />}
+              label="Location"
+              description="Add a new location to your map"
+              onClick={() => handleComponentClick('location')}
+              color="text-emerald-500"
+            />
+            <ComponentButton
+              icon={<Eye className="w-4 h-4" />}
+              label="Focal Point"
+              description="Add an interactive point to a location"
+              onClick={() => handleComponentClick('focalPoint')}
+              color="text-purple-500"
+            />
+            <ComponentButton
+              icon={<Zap className="w-4 h-4" />}
+              label="Event"
+              description="Add an event to a focal point"
+              onClick={() => handleComponentClick('event')}
+              color="text-yellow-500"
+            />
+          </div>
+        </>)}
       </div>
-      
+
       <div className="flex-1 bg-gray-950 flex flex-col relative">
         {game.Maps.length === 0 ? (
           <div className="flex-1 flex items-center justify-center">
@@ -369,9 +377,9 @@ export function GameEditor({ game, onChange }: GameEditorProps) {
               </div>
             </div>
             {activeMap !== null && (
-              <FlowEditor 
-                map={game.Maps[activeMap]} 
-                onChange={onChange} 
+              <FlowEditor
+                map={game.Maps[activeMap]}
+                onChange={onChange}
                 game={gameContext}
                 mapIndex={activeMap}
                 onNodeSelect={setSelectedNode}
