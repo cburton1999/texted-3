@@ -190,7 +190,7 @@ export default function GameInterface() {
       {/* Main Terminal */}
       <div className="scanline"></div>
       <div className="terminal-content flex-1">
-        <Card className="bg-transparent border-2 border-green-500 terminal-content-spacer">
+        <Card className="bg-transparent border-2 border-green-500">
           <div className="terminal-header flex justify-between items-center p-4">
             <span className="terminal-text font-mono">
               COBIN INDUSTRIES UNIFIED OPERATING SYSTEM
@@ -214,15 +214,13 @@ export default function GameInterface() {
           </div>
           <div 
             ref={scrollAreaRef}
-            className="terminal-messages font-mono text-green-500 h-full overflow-y-auto p-4 whitespace-pre-wrap"
+            className="terminal-messages font-mono text-green-500 h-[600px] overflow-y-auto p-4 whitespace-pre-wrap"
           >
-            <div className='test'>
-              {messages.map((message, index) => (
-                <span key={index} className="mb-2">
-                  {message}
-                </span>
-              ))}
-            </div>  
+            {messages.map((message, index) => (
+              <div key={index} className="mb-2">
+                {message}
+              </div>
+            ))}
           </div>
           <form onSubmit={handleCommand} className="p-4 border-t-2 border-green-500">
             <div className="flex gap-2 items-center">
